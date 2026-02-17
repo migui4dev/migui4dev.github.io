@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Méritos Navantia</title>
+</head>
+
+<body>
+    <style>
+        body {
+            margin: 0vw 5vw;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        .caja-form {
+            margin: 5px 0px;
+            padding: 5px;
+            border: 1px solid;
+        }
+
+        .alerta {
+            color: red;
+        }
+    </style>
+
+    <form id="mi-form">
+        <header>
+            <h2 class="alerta">Ningún apartado es acumulativo, sólo se tendrá en cuenta la titulación con mayor
+                puntuación de cada sección</h2>
+        </header>
+        <section class="caja-form">
+            <h2>FP:</h2>
+            <input type="radio" name="radio-fp" id="fp-básico-medio" value="4">
+            <label for="fp-básico-medio">FP Básico / G. Medio</label>
+            <br>
+            <input type="radio" name="radio-fp" id="fp-superior" value="7">
+            <label for="fp-superior">G. Superior</label>
+            <br>
+            <input type="radio" name="radio-fp" id="fp-dual" value="10">
+            <label for="fp-dual">FP Dual</label>
+            <br>
+            <input type="checkbox" name="chk-fp" id="fp-prácticas" value="2">
+            <label for="fp-prácticas">FP Dual 6 meses Navantia / Acreditación prácticas</label>
+        </section>
+        <section class="caja-form">
+            <h2>Inglés:</h2>
+            <input type="radio" name="radio-inglés" id="inglés-b1" value="3">
+            <label for="inglés-b1">B1</label>
+            <br>
+            <input type="radio" name="radio-inglés" id="inglés-b2" value="4">
+            <label for="inglés-b2">B2</label>
+        </section>
+        <section class="caja-form">
+            <h2>Experiencia laboral:</h2>
+            <input type="number" id="exp-meses" value="0" min="0" max="50">
+            <label for="exp-meses">meses (0,16 por mes)</label>
+        </section>
+        <section class="caja-form">
+            <h2>Curso de Prevención de Riesgos Laborales (PRL):</h2>
+            <input type="radio" name="radio-prl" id="prl-básico" value="2">
+            <label for="prl-básico">Básico (50 horas)</label>
+            <br>
+            <input type="radio" name="radio-prl" id="prl-medio" value="3">
+            <label for="prl-medio">Medio (300 horas)</label>
+            <br>
+            <input type="radio" name="radio-prl" id="prl-superior" value="6">
+            <label for="prl-superior">Superior (600 horas)</label>
+        </section>
+        <section class="caja-form">
+            <h2>Media superior a BIEN:</h2>
+            <input type="radio" name="radio-media" id="media-notable" value="6">
+            <label for="media-notable">Notable (7 a 8,99)</label>
+            <br>
+            <input type="radio" name="radio-media" id="media-sobresaliente" value="10">
+            <label for="media-sobresaliente">Sobresaliente (9 a 10)</label>
+        </section>
+        <input type="submit" value="Calcular nota">
+        <input type="reset" value="Reiniciar">
+    </form>
+
+    <script>
+        const form = document.getElementById("mi-form");
+        const máxPuntos = 40;
+        const máxPuntosTabla = 5;
+        const puntosPorMes = .16;
+        const máxMeses = 8 / puntosPorMes;
+
+        const redondearDecimal = (n) => Math.round(n * 100) / 100;
+        const pasarAPuntosTabla = (n) => redondearDecimal(n * máxPuntosTabla / máxPuntos);
+        const getNumber = (n) => n == null ? 0 : parseInt(n);
+        const calcularMesesAPuntos = (n) => n * puntosPorMes;
+
+        form.addEventListener("submit", (evt) => {
+            evt.preventDefault();
+
+            const datos = new FormData(form);
+            const fp = datos.get("radio-fp");
+            const chkFp = datos.get("chk-fp");
+            const expLaboral = document.getElementById("exp-meses");
+            const inglés = datos.get("radio-inglés");
+            const prl = datos.get("radio-prl");
+            const media = datos.get("radio-media");
+
+            const fpPts = getNumber(fp);
+            const chkFpPts = getNumber(chkFp);
+            const inglésPts = getNumber(inglés);
+            const expLaboralPts = getNumber(expLaboral.value);
+            const prlPts = getNumber(prl);
+            const mediaPts = getNumber(media);
+
+            const total = fpPts + chkFpPts + inglésPts + calcularMesesAPuntos(expLaboralPts) + prlPts + mediaPts;
+
+            let texto = "";
+
+            texto += (`Titulaciones y prácticas: ${fpPts + chkFpPts}/12 pts`);
+            texto += "\r\n";
+            texto += (`Inglés: ${inglésPts}/4 pts`);
+            texto += "\r\n";
+            texto += (`Exp. Laboral: ${calcularMesesAPuntos(expLaboralPts)}/${calcularMesesAPuntos(máxMeses)} pts`);
+            texto += "\r\n";
+            texto += (`PRL: ${prlPts}/6 pts`);
+            texto += "\r\n";
+            texto += (`Media Superior a BIEN: ${mediaPts}/10 pts`);
+            texto += "\r\n";
+            texto += (`TOTAL: ${total}/${máxPuntos} pts | ${pasarAPuntosTabla(total)}/${máxPuntosTabla} pts`);
+
+            alert(texto);
+
+        });
+    </script>
+
+</body>
+
+</html>
